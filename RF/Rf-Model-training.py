@@ -33,17 +33,16 @@ from sklearn.metrics import (
 print("=" * 65)
 print("STEP 0: Data Load")
 print("=" * 65)
+# ✅ FIXED: preprocess/RF folder থেকে load
+X_train_r = pd.read_csv('preprocess/RF/X_reg_train.csv')
+X_test_r  = pd.read_csv('preprocess/RF/X_reg_test.csv')
+y_train_r = pd.read_csv('preprocess/RF/y_reg_train.csv').squeeze()
+y_test_r  = pd.read_csv('preprocess/RF/y_reg_test.csv').squeeze()
 
-# ✅ FIXED: preprocess folder থেকে directly load
-X_train_r = pd.read_csv('preprocess/X_reg_train.csv')
-X_test_r  = pd.read_csv('preprocess/X_reg_test.csv')
-y_train_r = pd.read_csv('preprocess/y_reg_train.csv').squeeze()
-y_test_r  = pd.read_csv('preprocess/y_reg_test.csv').squeeze()
-
-X_train_c = pd.read_csv('preprocess/X_cls_train.csv')
-X_test_c  = pd.read_csv('preprocess/X_cls_test.csv')
-y_train_c = pd.read_csv('preprocess/y_cls_train.csv').squeeze()
-y_test_c  = pd.read_csv('preprocess/y_cls_test.csv').squeeze()
+X_train_c = pd.read_csv('preprocess/RF/X_cls_train.csv')
+X_test_c  = pd.read_csv('preprocess/RF/X_cls_test.csv')
+y_train_c = pd.read_csv('preprocess/RF/y_cls_train.csv').squeeze()
+y_test_c  = pd.read_csv('preprocess/RF/y_cls_test.csv').squeeze()
 
 # Validation — train থেকে 10% split
 X_train_r, X_val_r, y_train_r, y_val_r = train_test_split(
