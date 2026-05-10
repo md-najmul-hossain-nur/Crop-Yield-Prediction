@@ -23,7 +23,6 @@ warnings.filterwarnings('ignore')
 
 from sklearn.neural_network import MLPRegressor, MLPClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
     r2_score, mean_squared_error, mean_absolute_error,
     accuracy_score, f1_score
@@ -36,10 +35,10 @@ print("=" * 65)
 print("STEP 0: Data Load")
 print("=" * 65)
 
-# ✅ FIXED: val_augmented নেই, train থেকেই বানাচ্ছি
-df_full = pd.read_csv('train_augmented.csv')
-test    = pd.read_csv('test_original.csv')
-train, val = train_test_split(df_full, test_size=0.10, random_state=42)
+# ✅ FIXED: সঠিক path
+train = pd.read_csv('Data/agumnetation/train_augmented.csv')
+val   = pd.read_csv('Data/agumnetation/val_augmented.csv')
+test  = pd.read_csv('Data/agumnetation/test_original.csv')
 
 print(f"Train : {train.shape[0]:,} rows")
 print(f"Val   : {val.shape[0]:,} rows")
@@ -90,7 +89,7 @@ y_train_c = train['Crop_enc'].values
 y_val_c   = val['Crop_enc'].values
 y_test_c  = test['Crop_enc'].values
 
-print(f"Regression  — X_train: {X_train_r.shape}  X_test: {X_test_r.shape}")
+print(f"Regression     — X_train: {X_train_r.shape}  X_test: {X_test_r.shape}")
 print(f"Classification — X_train: {X_train_c.shape}  X_test: {X_test_c.shape}")
 print("Scaling সম্পন্ন ✅")
 
