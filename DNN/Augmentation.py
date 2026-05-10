@@ -22,7 +22,7 @@ print("=" * 60)
 print("STEP 0: Loading Dataset")
 print("=" * 60)
 
-df = pd.read_csv('dataset_cleaned.csv')
+df = pd.read_csv('preprocess/RF/dataset_cleaned.csv')
 print(f"✅ Original shape: {df.shape}")
 
 # Numeric columns যেগুলোতে augmentation করব
@@ -310,10 +310,14 @@ print("\n" + "=" * 60)
 print("STEP 5: Files Save করা")
 print("=" * 60)
 
+import os
+os.makedirs('Data/agumnetation', exist_ok=True)
+os.makedirs('preprocess/dnn', exist_ok=True)
+
 # Full augmented datasets
-df_train_final.to_csv('train_augmented.csv', index=False)
-df_val.to_csv('val_augmented.csv',           index=False)
-df_test.to_csv('test_original.csv',          index=False)
+df_train_final.to_csv('Data/agumnetation/train_augmented.csv', index=False)
+df_val.to_csv('Data/agumnetation/val_augmented.csv', index=False)
+df_test.to_csv('Data/agumnetation/test_original.csv', index=False)
 
 # Regression splits
 X_train_reg.to_csv('X_train_reg.csv', index=False)
@@ -358,3 +362,4 @@ print(f"  Regression target      : Production_log")
 print(f"  Classification target  : Crop_enc (72 classes)")
 print("=" * 60)
 print("\n  এখন DNN model train করতে পারবে! 🎉")
+
