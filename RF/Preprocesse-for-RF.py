@@ -209,7 +209,7 @@ print("=" * 60)
 df.to_csv('preprocess/RF/dataset_cleaned.csv', index=False)
 
 # Save regression splits
-X_reg_train.to_csv('preprocess/RF/RF/X_reg_train.csv', index=False)
+X_reg_train.to_csv('preprocess/RF/X_reg_train.csv', index=False)  # ← RF/RF ছিল, ঠিক করা হয়েছে
 X_reg_test.to_csv('preprocess/RF/X_reg_test.csv',   index=False)
 y_reg_train.to_csv('preprocess/RF/y_reg_train.csv', index=False)
 y_reg_test.to_csv('preprocess/RF/y_reg_test.csv',   index=False)

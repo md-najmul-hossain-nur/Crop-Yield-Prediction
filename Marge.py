@@ -22,9 +22,9 @@ print("=" * 60)
 print("STEP 0: Loading Datasets")
 print("=" * 60)
 
-spas    = pd.read_csv('SPAS-Dataset-BD.csv')
-weather = pd.read_csv('65_Years_of_Weather_Data_Bangladesh__1948_-_2013_.csv')
-crop    = pd.read_csv('Crop_recommendation.csv')
+spas    = pd.read_csv('Data//dataset/SPAS-Dataset-BD.csv')
+weather = pd.read_csv('Data/dataset/65 Years of Weather Data Bangladesh (1948 - 2013).csv')
+crop    = pd.read_csv('Data/dataset/Crop_recommendation.csv')
 
 print(f"✅ SPAS Dataset         : {spas.shape}")
 print(f"✅ Weather Dataset      : {weather.shape}")
@@ -306,7 +306,7 @@ print("\n" + "=" * 60)
 print("STEP 6: Saving Merged Dataset")
 print("=" * 60)
 
-df_merged.to_csv('merged_dataset.csv', index=False)
+df_merged.to_csv('Data/Marge/merged_dataset.csv', index=False)
 print(f"✅ Saved: merged_dataset.csv")
 print(f"   Shape: {df_merged.shape}")
 
