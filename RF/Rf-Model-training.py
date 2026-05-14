@@ -33,7 +33,7 @@ from sklearn.metrics import (
 print("=" * 65)
 print("STEP 0: Data Load")
 print("=" * 65)
-# ✅ FIXED: preprocess/RF folder থেকে load
+#  FIXED: preprocess/RF folder থেকে load
 X_train_r = pd.read_csv('preprocess/RF/X_reg_train.csv')
 X_test_r  = pd.read_csv('preprocess/RF/X_reg_test.csv')
 y_train_r = pd.read_csv('preprocess/RF/y_reg_train.csv').squeeze()
@@ -77,7 +77,6 @@ def cls_report(name, y_true, y_pred):
     print(f"  {name:<12} Accuracy={acc:.4f}  F1={f1:.4f}")
     return acc, f1
 
-
 # ══════════════════════════════════════════════
 #   TASK A — REGRESSION
 # ══════════════════════════════════════════════
@@ -117,8 +116,6 @@ for name, res in reg_results.items():
           f"{res['test_rmse']:>8.4f} {res['test_mae']:>8.4f}")
 best_reg = max(reg_results, key=lambda m: reg_results[m]['test_r2'])
 print(f"\n  Best: {best_reg}  (R²={reg_results[best_reg]['test_r2']:.4f})")
-
-
 # ══════════════════════════════════════════════
 #   TASK B — CLASSIFICATION
 # ══════════════════════════════════════════════
@@ -157,8 +154,6 @@ for name, res in cls_results.items():
     print(f"  {name:<22} {res['val_acc']:>9.4f} {res['test_acc']:>9.4f} {res['test_f1']:>8.4f}")
 best_cls = max(cls_results, key=lambda m: cls_results[m]['test_f1'])
 print(f"\n  Best: {best_cls}  (F1={cls_results[best_cls]['test_f1']:.4f})")
-
-
 # ══════════════════════════════════════════════
 #   CHARTS
 # ══════════════════════════════════════════════
@@ -223,8 +218,8 @@ ax.set_title('Task B — Feature Importance\n(Random Forest)', fontweight='bold'
 ax.set_xlabel('Importance Score')
 
 plt.tight_layout()
-plt.savefig('model_comparison.png', dpi=150, bbox_inches='tight')
-print("Saved: model_comparison.png")
+plt.savefig('rf_model_comparison.png', dpi=150, bbox_inches='tight')
+print("Saved: rf_model_comparison.png")
 
 # Feature Importance — Regression
 fig2, ax2 = plt.subplots(figsize=(10, 6))
@@ -234,8 +229,8 @@ ax2.set_title('Task A — Feature Importance (Random Forest Regressor)\n'
               'Team: Light Seekers | CSE-4889', fontweight='bold')
 ax2.set_xlabel('Importance Score')
 plt.tight_layout()
-plt.savefig('feature_importance_regression.png', dpi=150, bbox_inches='tight')
-print("Saved: feature_importance_regression.png")
+plt.savefig('rf_feature_importance_regression.png', dpi=150, bbox_inches='tight')
+print("Saved: rf_feature_importance_regression.png")
 
 
 # ══════════════════════════════════════════════
