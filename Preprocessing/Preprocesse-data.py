@@ -16,7 +16,7 @@
    10. Summary report + shape chart
 
   Run from: Crop-Yield-Prediction/
-  Output  : Data/Preprocessing/Data/ folder
+  Output  : Preprocessing/Data/ folder
 =============================================================
 """
 
@@ -30,7 +30,7 @@ warnings.filterwarnings('ignore')
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.model_selection import train_test_split
 
-os.makedirs('Data/Preprocessing/Data', exist_ok=True)
+os.makedirs('Preprocessing/Data', exist_ok=True)
 
 # ─────────────────────────────────────────────
 # STEP 1: Load
@@ -115,7 +115,7 @@ enc_df = pd.DataFrame({
     'Season_label'  : le_season.classes_,
     'Season_enc'    : le_season.transform(le_season.classes_)
 })
-enc_df.to_csv('Data/Preprocessing/Data/season_encoding.csv', index=False)
+enc_df.to_csv('Preprocessing/Data/season_encoding.csv', index=False)
 
 crop_enc_df = pd.DataFrame({
     'Crop_label' : le_crop.classes_,
@@ -127,7 +127,7 @@ district_enc_df = pd.DataFrame({
     'District_label' : le_district.classes_,
     'District_enc'   : le_district.transform(le_district.classes_)
 })
-district_enc_df.to_csv('Data/Preprocessing/Data/district_encoding.csv', index=False)
+district_enc_df.to_csv('Data/P reprocessing/Data/district_encoding.csv', index=False)
 
 print(f"  ✅ Encoding maps saved to Data/Preprocessing/Data/")
 
@@ -209,26 +209,26 @@ print(f"    Test  : {X_te_c.shape[0]:>5} rows  ({X_te_c.shape[0]/len(df)*100:.1f
 # STEP 9: Save
 # ─────────────────────────────────────────────
 print("\n" + "=" * 60)
-print("STEP 9: Saving to Data/Preprocessing/Data/")
+print("STEP 9: Saving to Preprocessing/Data/")
 print("=" * 60)
 
 # Regression files
-X_tr_r.to_csv('Data/Preprocessing/Data/X_reg_train.csv',   index=False)
-X_val_r.to_csv('Data/Preprocessing/Data/X_reg_val.csv',    index=False)
-X_te_r.to_csv('Data/Preprocessing/Data/X_reg_test.csv',    index=False)
-y_tr_r.to_csv('Data/Preprocessing/Data/y_reg_train.csv',   index=False)
-y_val_r.to_csv('Data/Preprocessing/Data/y_reg_val.csv',    index=False)
-y_te_r.to_csv('Data/Preprocessing/Data/y_reg_test.csv',    index=False)
+X_tr_r.to_csv('Preprocessing/Data/X_reg_train.csv',   index=False)
+X_val_r.to_csv('Preprocessing/Data/X_reg_val.csv',    index=False)
+X_te_r.to_csv('Preprocessing/Data/X_reg_test.csv',    index=False)
+y_tr_r.to_csv('Preprocessing/Data/y_reg_train.csv',   index=False)
+y_val_r.to_csv('Preprocessing/Data/y_reg_val.csv',    index=False)
+y_te_r.to_csv('Preprocessing/Data/y_reg_test.csv',    index=False)
 
 # Classification files
-X_tr_c.to_csv('Data/Preprocessing/Data/X_cls_train.csv',   index=False)
-X_val_c.to_csv('Data/Preprocessing/Data/X_cls_val.csv',    index=False)
-X_te_c.to_csv('Data/Preprocessing/Data/X_cls_test.csv',    index=False)
-y_tr_c.to_csv('Data/Preprocessing/Data/y_cls_train.csv',   index=False)
-y_val_c.to_csv('Data/Preprocessing/Data/y_cls_val.csv',    index=False)
-y_te_c.to_csv('Data/Preprocessing/Data/y_cls_test.csv',    index=False)
+X_tr_c.to_csv('Preprocessing/Data/X_cls_train.csv',   index=False)
+X_val_c.to_csv('Preprocessing/Data/X_cls_val.csv',    index=False)
+X_te_c.to_csv('Preprocessing/Data/X_cls_test.csv',    index=False)
+y_tr_c.to_csv('Preprocessing/Data/y_cls_train.csv',   index=False)
+y_val_c.to_csv('Preprocessing/Data/y_cls_val.csv',    index=False)
+y_te_c.to_csv('Preprocessing/Data/y_cls_test.csv',    index=False)
 
-print("  ✅ Saved:")
+print("   Saved:")
 print("     Regression     → X_reg_train/val/test.csv, y_reg_train/val/test.csv")
 print("     Classification → X_cls_train/val/test.csv, y_cls_train/val/test.csv")
 print("     Encodings      → season/crop/district_encoding.csv")
@@ -313,8 +313,8 @@ for b, v in zip(bars, corr['Production_log']):
             fontsize=9)
 
 plt.tight_layout()
-plt.savefig('Data/Preprocessing/Data/preprocess_summary.png', dpi=150, bbox_inches='tight')
-print("  ✅ Saved: Data/Preprocessing/Data/preprocess_summary.png")
+plt.savefig('Preprocessing/Data/preprocess_summary.png', dpi=150, bbox_inches='tight')
+print("   Saved: Data/Preprocessing/Data/preprocess_summary.png")
 
 # ─────────────────────────────────────────────
 # Final Summary
@@ -329,7 +329,7 @@ print(f"  Unique districts : {df['District'].nunique()}")
 print(f"  Unique seasons   : {df['Season'].nunique()}")
 print(f"  Reg features     : {len(REG_FEATURES)}")
 print(f"  Cls features     : {len(CLS_FEATURES)}")
-print(f"\n  Files saved in Data/Preprocessing/Data/:")
+print(f"\n  Files saved in Preprocessing/Data/:")
 files = [
     'X_reg_train.csv', 'X_reg_val.csv', 'X_reg_test.csv',
     'y_reg_train.csv', 'y_reg_val.csv', 'y_reg_test.csv',
