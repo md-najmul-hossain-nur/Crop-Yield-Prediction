@@ -1,0 +1,9 @@
+*.pkl
+*.npy
+*.h5
+*.pt
+*.pth
+__pycache__/
+*.pyc
+Augmentation/models/
+Augmentation/Data/augmented_dataset.csv
