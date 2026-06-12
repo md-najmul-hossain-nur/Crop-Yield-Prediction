@@ -121,15 +121,15 @@ crop_enc_df = pd.DataFrame({
     'Crop_label' : le_crop.classes_,
     'Crop_enc'   : le_crop.transform(le_crop.classes_)
 })
-crop_enc_df.to_csv('Data/Preprocessing/Data/crop_encoding.csv', index=False)
+crop_enc_df.to_csv('Preprocessing/Data/crop_encoding.csv', index=False)
 
 district_enc_df = pd.DataFrame({
     'District_label' : le_district.classes_,
     'District_enc'   : le_district.transform(le_district.classes_)
 })
-district_enc_df.to_csv('Data/Preprocessing/Data/district_encoding.csv', index=False)
+district_enc_df.to_csv('Preprocessing/Data/district_encoding.csv', index=False)
 
-print(f"  ✅ Encoding maps saved to Data/Preprocessing/Data/")
+print(f"  Encoding maps saved to Preprocessing/Data/")
 
 # ─────────────────────────────────────────────
 # STEP 6: Log Transform Target
