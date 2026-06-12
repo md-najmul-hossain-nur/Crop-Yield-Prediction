@@ -127,7 +127,7 @@ district_enc_df = pd.DataFrame({
     'District_label' : le_district.classes_,
     'District_enc'   : le_district.transform(le_district.classes_)
 })
-district_enc_df.to_csv('Data/P reprocessing/Data/district_encoding.csv', index=False)
+district_enc_df.to_csv('Data/Preprocessing/Data/district_encoding.csv', index=False)
 
 print(f"  ✅ Encoding maps saved to Data/Preprocessing/Data/")
 

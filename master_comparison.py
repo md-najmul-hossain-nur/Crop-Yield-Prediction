@@ -37,6 +37,75 @@ from sklearn.metrics import (
 os.makedirs("Output", exist_ok=True)
 
 # ═══════════════════════════════════════════════════════════
+# HELPER: Save a per-pipeline chart (RF vs GB vs DNN)
+# ═══════════════════════════════════════════════════════════
+def save_pipeline_chart(pipe_label, reg, cls, filename):
+    """Saves a 2x3 bar chart for one pipeline (RF vs GB vs DNN)."""
+    models   = ['RF', 'GB', 'DNN']
+    colors   = {'RF': '#2ecc71', 'GB': '#3498db', 'DNN': '#e74c3c'}
+    x        = np.arange(len(models))
+
+    fig, axes = plt.subplots(2, 3, figsize=(16, 9))
+    fig.suptitle(
+        f'{pipe_label}  —  RF vs GB vs DNN\n'
+        'Team: Light Seekers | CSE-4889 | UIU Bangladesh',
+        fontsize=13, fontweight='bold', y=0.98
+    )
+
+    def bar_metric(ax, vals, title, ylabel, best='max'):
+        bar_list = ax.bar(x, vals, color=[colors[m] for m in models],
+                          edgecolor='white', linewidth=1.5, width=0.55)
+        for b, v in zip(bar_list, vals):
+            ax.text(b.get_x()+b.get_width()/2, v+0.005,
+                    f'{v:.4f}', ha='center', va='bottom',
+                    fontsize=10, fontweight='bold')
+        # gold border on best
+        best_idx = vals.index(max(vals)) if best=='max' else vals.index(min(vals))
+        bar_list[best_idx].set_edgecolor('gold')
+        bar_list[best_idx].set_linewidth(3)
+
+        ax.set_title(title, fontweight='bold', fontsize=10)
+        ax.set_ylabel(ylabel)
+        ax.set_xticks(x); ax.set_xticklabels(models, fontsize=11)
+        ax.grid(axis='y', alpha=0.3)
+        ax.set_ylim(0, max(vals)*1.22)
+
+    # Row 1 — Regression
+    bar_metric(axes[0,0], [reg[m]['r2']   for m in models], 'Regression — R2 (higher = better)',  'R2',   'max')
+    bar_metric(axes[0,1], [reg[m]['rmse'] for m in models], 'Regression — RMSE (lower = better)', 'RMSE', 'min')
+    bar_metric(axes[0,2], [reg[m]['mae']  for m in models], 'Regression — MAE (lower = better)',  'MAE',  'min')
+
+    # Row 2 — Classification
+    bar_metric(axes[1,0], [cls[m]['acc']  for m in models], 'Classification — Accuracy (higher)', 'Accuracy', 'max')
+    bar_metric(axes[1,1], [cls[m]['f1']   for m in models], 'Classification — F1 Score (higher)', 'F1 Score', 'max')
+
+    # Summary table
+    ax = axes[1,2]; ax.axis('off')
+    tdata = [[m,
+              f"{reg[m]['r2']:.4f}",
+              f"{reg[m]['rmse']:.4f}",
+              f"{reg[m]['mae']:.4f}",
+              f"{cls[m]['acc']:.4f}",
+              f"{cls[m]['f1']:.4f}"] for m in models]
+    tbl = ax.table(cellText=tdata,
+                   colLabels=['Model','R2','RMSE','MAE','Acc','F1'],
+                   loc='center', cellLoc='center')
+    tbl.auto_set_font_size(False); tbl.set_fontsize(9); tbl.scale(1.2, 2.0)
+    for j in range(6):
+        tbl[0,j].set_facecolor('#2c3e50')
+        tbl[0,j].set_text_props(color='white', fontweight='bold')
+    row_colors = ['#eafaf1','#eaf4fb','#fef9e7']
+    for ri,rc in enumerate(row_colors):
+        for j in range(6): tbl[ri+1,j].set_facecolor(rc)
+    ax.set_title('Results Summary', fontweight='bold', fontsize=10)
+
+    plt.tight_layout(rect=[0,0.02,1,0.95])
+    plt.savefig(filename, dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"  Chart saved: {filename}")
+
+
+# ═══════════════════════════════════════════════════════════
 # HELPER: Train all 3 models on a given dataset
 # ═══════════════════════════════════════════════════════════
 def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
@@ -44,17 +113,21 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
                      label=""):
     res_reg = {}
     res_cls = {}
+    large   = len(X_tr_r) > 10000   # augmented dataset flag
 
     # ── RF Regressor ──
     print(f"  [{label}] RF Regressor...")
-    rf_reg = RandomForestRegressor(n_estimators=150, max_depth=20,
-                                   min_samples_leaf=2, n_jobs=-1, random_state=42)
+    rf_reg = RandomForestRegressor(
+        n_estimators=80 if large else 150,
+        max_depth=15 if large else 20,
+        min_samples_leaf=4 if large else 2,
+        n_jobs=2 if large else -1, random_state=42)
     rf_reg.fit(X_tr_r, y_tr_r)
     p = rf_reg.predict(X_te_r)
     res_reg['RF'] = dict(r2=r2_score(y_te_r, p),
                          rmse=np.sqrt(mean_squared_error(y_te_r, p)),
                          mae=mean_absolute_error(y_te_r, p))
-    print(f"         R²={res_reg['RF']['r2']:.4f}  RMSE={res_reg['RF']['rmse']:.4f}")
+    print(f"         R2={res_reg['RF']['r2']:.4f}  RMSE={res_reg['RF']['rmse']:.4f}")
 
     # ── GB Regressor ──
     print(f"  [{label}] GB Regressor...")
@@ -65,27 +138,32 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
     res_reg['GB'] = dict(r2=r2_score(y_te_r, p),
                          rmse=np.sqrt(mean_squared_error(y_te_r, p)),
                          mae=mean_absolute_error(y_te_r, p))
-    print(f"         R²={res_reg['GB']['r2']:.4f}  RMSE={res_reg['GB']['rmse']:.4f}")
+    print(f"         R2={res_reg['GB']['r2']:.4f}  RMSE={res_reg['GB']['rmse']:.4f}")
 
     # ── DNN Regressor ──
     print(f"  [{label}] DNN Regressor...")
-    dnn_reg = MLPRegressor(hidden_layer_sizes=(256, 128, 64, 32), activation='relu',
-                           solver='adam', learning_rate_init=0.001, max_iter=300,
-                           early_stopping=True, validation_fraction=0.1,
-                           n_iter_no_change=20, batch_size=256,
-                           random_state=42, verbose=False)
+    dnn_reg = MLPRegressor(
+        hidden_layer_sizes=(128, 64, 32) if large else (256, 128, 64, 32),
+        activation='relu', solver='adam', learning_rate_init=0.001,
+        max_iter=300, early_stopping=not large,
+        validation_fraction=0.05 if not large else 0.0,
+        n_iter_no_change=20, batch_size=512 if large else 256,
+        random_state=42, verbose=False)
     dnn_reg.fit(X_tr_r, y_tr_r)
     p = dnn_reg.predict(X_te_r)
     res_reg['DNN'] = dict(r2=r2_score(y_te_r, p),
                           rmse=np.sqrt(mean_squared_error(y_te_r, p)),
                           mae=mean_absolute_error(y_te_r, p))
-    print(f"         R²={res_reg['DNN']['r2']:.4f}  RMSE={res_reg['DNN']['rmse']:.4f}  Epochs={dnn_reg.n_iter_}")
+    print(f"         R2={res_reg['DNN']['r2']:.4f}  RMSE={res_reg['DNN']['rmse']:.4f}  Epochs={dnn_reg.n_iter_}")
 
     # ── RF Classifier ──
     print(f"  [{label}] RF Classifier...")
-    rf_cls = RandomForestClassifier(n_estimators=150, max_depth=20,
-                                    min_samples_leaf=2, class_weight='balanced',
-                                    n_jobs=-1, random_state=42)
+    rf_cls = RandomForestClassifier(
+        n_estimators=80 if large else 150,
+        max_depth=15 if large else 20,
+        min_samples_leaf=4 if large else 2,
+        class_weight='balanced',
+        n_jobs=2 if large else -1, random_state=42)
     rf_cls.fit(X_tr_c, y_tr_c)
     p = rf_cls.predict(X_te_c)
     res_cls['RF'] = dict(acc=accuracy_score(y_te_c, p),
@@ -104,11 +182,14 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
 
     # ── DNN Classifier ──
     print(f"  [{label}] DNN Classifier...")
-    dnn_cls = MLPClassifier(hidden_layer_sizes=(256, 128, 64), activation='relu',
-                            solver='adam', learning_rate_init=0.001, max_iter=300,
-                            early_stopping=True, validation_fraction=0.1,
-                            n_iter_no_change=20, batch_size=256,
-                            random_state=42, verbose=False)
+    large = len(X_tr_c) > 10000
+    dnn_cls = MLPClassifier(
+        hidden_layer_sizes=(128, 64, 32) if large else (256, 128, 64),
+        activation='relu', solver='adam', learning_rate_init=0.001,
+        max_iter=300, early_stopping=not large,
+        validation_fraction=0.05 if not large else 0.0,
+        n_iter_no_change=20, batch_size=512 if large else 256,
+        random_state=42, verbose=False)
     dnn_cls.fit(X_tr_c, y_tr_c)
     p = dnn_cls.predict(X_te_c)
     res_cls['DNN'] = dict(acc=accuracy_score(y_te_c, p),
@@ -173,6 +254,11 @@ print(f"  Train: {len(X_tr_r):,}  Val: {len(X_vl_r):,}  Test: {len(X_te_r):,}")
 p1_reg, p1_cls = train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
                                    X_tr_c, y_tr_c, X_te_c, y_te_c,
                                    label="Merged")
+save_pipeline_chart(
+    'Merged Dataset  (Raw, 4,607 rows)',
+    p1_reg, p1_cls,
+    'Output/merged_dataset_comparison.png'
+)
 
 
 # ═══════════════════════════════════════════════════════════
@@ -197,6 +283,11 @@ print(f"  Train: {len(X_tr_r2):,}  Test: {len(X_te_r2):,}")
 p2_reg, p2_cls = train_all_models(X_tr_r2, y_tr_r2, X_te_r2, y_te_r2,
                                    X_tr_c2, y_tr_c2, X_te_c2, y_te_c2,
                                    label="Preprocess")
+save_pipeline_chart(
+    'Preprocessed Dataset  (Cleaned + Scaled, 4,607 rows)',
+    p2_reg, p2_cls,
+    'Output/preprocessed_dataset_comparison.png'
+)
 
 
 # ═══════════════════════════════════════════════════════════
@@ -221,6 +312,11 @@ print(f"  Train: {len(X_tr_r3):,}  Test: {len(X_te_r3):,}")
 p3_reg, p3_cls = train_all_models(X_tr_r3, y_tr_r3, X_te_r3, y_te_r3,
                                    X_tr_c3, y_tr_c3, X_te_c3, y_te_c3,
                                    label="Augmented")
+save_pipeline_chart(
+    'Augmented Dataset  (50,000 rows — Gaussian Noise + KNN + Season Scaling)',
+    p3_reg, p3_cls,
+    'Output/augmented_dataset_comparison.png'
+)
 
 
 # ═══════════════════════════════════════════════════════════
@@ -340,7 +436,7 @@ fig.legend(handles=patches + [gold_p],
 
 plt.tight_layout(rect=[0, 0.04, 1, 0.96])
 plt.savefig('Output/master_comparison.png', dpi=150, bbox_inches='tight')
-print("✅ Saved: Output/master_comparison.png")
+print("  Saved: Output/master_comparison.png")
 
 
 # ═══════════════════════════════════════════════════════════
@@ -379,8 +475,11 @@ best_r2_entry  = max(all_r2,  key=lambda x: x[2])
 best_acc_entry = max(all_acc, key=lambda x: x[2])
 
 print("=" * 60)
-print(f"  🏆 Best Regression (R²) : {best_r2_entry[0]} — {best_r2_entry[1]}  →  R²={best_r2_entry[2]:.4f}")
-print(f"  🏆 Best Classification  : {best_acc_entry[0]} — {best_acc_entry[1]}  →  Acc={best_acc_entry[2]:.4f}")
+print(f"  Best Regression (R2)  : {best_r2_entry[0]} — {best_r2_entry[1]}  R2={best_r2_entry[2]:.4f}")
+print(f"  Best Classification   : {best_acc_entry[0]} — {best_acc_entry[1]}  Acc={best_acc_entry[2]:.4f}")
 print("=" * 60)
-print("✅ Master Comparison সম্পন্ন!")
-print("→ Chart: Output/master_comparison.png")
+print("  All charts saved to Output/")
+print("    merged_dataset_comparison.png")
+print("    preprocessed_dataset_comparison.png")
+print("    augmented_dataset_comparison.png")
+print("    master_comparison.png")
