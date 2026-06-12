@@ -113,14 +113,14 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
                      label=""):
     res_reg = {}
     res_cls = {}
-    large   = len(X_tr_r) > 10000   # augmented dataset flag
+    large = len(X_tr_r) > 10000   # augmented dataset flag
 
     # ── RF Regressor ──
     print(f"  [{label}] RF Regressor...")
     rf_reg = RandomForestRegressor(
-        n_estimators=80 if large else 150,
-        max_depth=15 if large else 20,
-        min_samples_leaf=4 if large else 2,
+        n_estimators=100 if large else 150,
+        max_depth=18 if large else 20,
+        min_samples_leaf=3 if large else 2,
         n_jobs=2 if large else -1, random_state=42)
     rf_reg.fit(X_tr_r, y_tr_r)
     p = rf_reg.predict(X_te_r)
@@ -131,8 +131,9 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
 
     # ── GB Regressor ──
     print(f"  [{label}] GB Regressor...")
-    gb_reg = HistGradientBoostingRegressor(max_iter=150, learning_rate=0.05,
-                                            max_depth=6, random_state=42)
+    gb_reg = HistGradientBoostingRegressor(max_iter=200 if large else 150,
+                                            learning_rate=0.05, max_depth=6,
+                                            random_state=42)
     gb_reg.fit(X_tr_r, y_tr_r)
     p = gb_reg.predict(X_te_r)
     res_reg['GB'] = dict(r2=r2_score(y_te_r, p),
@@ -143,10 +144,10 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
     # ── DNN Regressor ──
     print(f"  [{label}] DNN Regressor...")
     dnn_reg = MLPRegressor(
-        hidden_layer_sizes=(128, 64, 32) if large else (256, 128, 64, 32),
+        hidden_layer_sizes=(256, 128, 64, 32),
         activation='relu', solver='adam', learning_rate_init=0.001,
-        max_iter=300, early_stopping=not large,
-        validation_fraction=0.05 if not large else 0.0,
+        max_iter=400, early_stopping=True,
+        validation_fraction=0.05,
         n_iter_no_change=20, batch_size=512 if large else 256,
         random_state=42, verbose=False)
     dnn_reg.fit(X_tr_r, y_tr_r)
@@ -159,9 +160,9 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
     # ── RF Classifier ──
     print(f"  [{label}] RF Classifier...")
     rf_cls = RandomForestClassifier(
-        n_estimators=80 if large else 150,
-        max_depth=15 if large else 20,
-        min_samples_leaf=4 if large else 2,
+        n_estimators=100 if large else 150,
+        max_depth=18 if large else 20,
+        min_samples_leaf=3 if large else 2,
         class_weight='balanced',
         n_jobs=2 if large else -1, random_state=42)
     rf_cls.fit(X_tr_c, y_tr_c)
@@ -172,8 +173,9 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
 
     # ── GB Classifier ──
     print(f"  [{label}] GB Classifier...")
-    gb_cls = HistGradientBoostingClassifier(max_iter=150, learning_rate=0.05,
-                                             max_depth=6, random_state=42)
+    gb_cls = HistGradientBoostingClassifier(max_iter=200 if large else 150,
+                                             learning_rate=0.05, max_depth=6,
+                                             random_state=42)
     gb_cls.fit(X_tr_c, y_tr_c)
     p = gb_cls.predict(X_te_c)
     res_cls['GB'] = dict(acc=accuracy_score(y_te_c, p),
@@ -182,12 +184,11 @@ def train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,
 
     # ── DNN Classifier ──
     print(f"  [{label}] DNN Classifier...")
-    large = len(X_tr_c) > 10000
     dnn_cls = MLPClassifier(
-        hidden_layer_sizes=(128, 64, 32) if large else (256, 128, 64),
+        hidden_layer_sizes=(256, 128, 64),
         activation='relu', solver='adam', learning_rate_init=0.001,
-        max_iter=300, early_stopping=not large,
-        validation_fraction=0.05 if not large else 0.0,
+        max_iter=400, early_stopping=True,
+        validation_fraction=0.05,
         n_iter_no_change=20, batch_size=512 if large else 256,
         random_state=42, verbose=False)
     dnn_cls.fit(X_tr_c, y_tr_c)
