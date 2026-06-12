@@ -1,162 +1,69 @@
-
 ================================================================
-  HOW TO RUN — CROP YIELD PREDICTION PROJECT
-  Team: Light Seekers | Course: CSE-4889 | UIU Bangladesh
-================================================================
-
-
-================================================================
-  STEP 0 — LIBRARY INSTALL (প্রথমবার শুধু একবার করতে হবে)
+  HOW TO RUN — CROP YIELD PREDICTION
+  Team: Light Seekers | CSE-4889 | UIU Bangladesh
 ================================================================
 
-  Terminal এ এই command দাও:
-
-    pip install scikit-learn pandas numpy matplotlib flask
-
-  সব install হলে দেখাবে:
-    Successfully installed ...
-
-  Note: Python 3.8+ থাকলেই হবে।
+FIRST TIME SETUP — একবারই করতে হবে
+----------------------------------------------------------------
+  pip install scikit-learn pandas numpy matplotlib flask
 
 
-================================================================
-  STEP 1 — Folder এ যাও
-================================================================
-
-  VS Code এ Terminal খোলো: View → Terminal  (Ctrl + `)
-
-  তারপর:
-    cd d:\mlll\Crop-Yield-Prediction
-
-
-================================================================
-  STEP 2 — Dataset Merge করো
-================================================================
-
+STEP 1 — Dataset Merge
+----------------------------------------------------------------
   python Data/Marge/Marge.py
 
-  কি হবে:
-    3টা dataset একটাতে জুড়বে
-    তৈরি হবে: Data/Marge/merged_dataset.csv  (4,607 rows)
+  Output: Data/Marge/merged_dataset.csv
 
 
-================================================================
-  STEP 3 — Data Preprocess করো
-================================================================
-
+STEP 2 — Preprocess
+----------------------------------------------------------------
   python Preprocessing/Preprocesse-data.py
 
-  কি হবে:
-    Data clean (outlier বাদ, encoding, log transform, scale)
-    তৈরি হবে: Preprocessing/Data/  folder এ 12টা CSV file
+  Output: Preprocessing/Data/ (12 CSV files)
 
 
-================================================================
-  STEP 4 — Data Augment করো (4,607 → 50,000 rows)
-================================================================
-
+STEP 3 — Augment Data (4,607 → 50,000 rows)
+----------------------------------------------------------------
   python Augmentation/augment_data.py
 
-  কি হবে:
-    Gaussian Noise + KNN Interpolation + Season Scaling
-    তৈরি হবে: Augmentation/Data/augmented_dataset.csv  (50,000 rows)
-
-  তারপর augmented data preprocess করো:
-
-    python Augmentation/augmented_preprocess.py
-
-  কি হবে:
-    Augmentation/Data/ folder এ split CSVs তৈরি হবে
+  Output: Augmentation/Data/augmented_dataset.csv
 
 
-================================================================
-  STEP 5 — সব Model Train করো + Chart বানাও
-================================================================
+STEP 4 — Preprocess Augmented Data
+----------------------------------------------------------------
+  python Augmentation/augmented_preprocess.py
 
+  Output: Augmentation/Data/ (split CSV files)
+
+
+STEP 5 — Train All Models + Generate Charts
+----------------------------------------------------------------
   python master_comparison.py
 
-  কি হবে step by step:
-
-    [1] Merged Dataset load → RF train → GB train → DNN train
-        Chart: Output/merged_dataset_comparison.png
-
-    [2] Preprocessed Dataset load → RF → GB → DNN
-        Chart: Output/preprocessed_dataset_comparison.png
-
-    [3] Augmented Dataset (50k) → RF → GB → DNN
-        Chart: Output/augmented_dataset_comparison.png
-
-    [4] Final master comparison chart (সব 9 result একসাথে)
-        Chart: Output/master_comparison.png
-
-  সময় লাগবে: ~8-15 মিনিট
+  Output:
+    Output/merged_dataset_comparison.png
+    Output/preprocessed_dataset_comparison.png
+    Output/augmented_dataset_comparison.png
+    Output/master_comparison.png
 
 
-================================================================
-  STEP 6 — Web App চালাও (Optional)
-================================================================
-
+STEP 6 — Web App (Optional)
+----------------------------------------------------------------
   python app.py
 
-  তারপর browser এ যাও:
-    http://127.0.0.1:8080
-
-  কি পাবে:
-    District, Season, Soil, Weather দিলে
-    → Recommended Crop কোনটা
-    → Expected Yield কত (metric tons)
+  Browser: http://127.0.0.1:8080
 
 
-================================================================
-  OUTPUT — কোথায় কি chart পাবে
-================================================================
-
-  Output/merged_dataset_comparison.png
-      Merged raw data তে RF vs GB vs DNN
-      (R2, RMSE, MAE, Accuracy, F1)
-
-  Output/preprocessed_dataset_comparison.png
-      Preprocessed data তে RF vs GB vs DNN
-
-  Output/augmented_dataset_comparison.png
-      Augmented 50k data তে RF vs GB vs DNN
-
-  Output/master_comparison.png
-      সব 3 pipeline x 3 model = 9 result একসাথে
-      (Final comparison chart)
-
-  Preprocessing/Data/preprocess_summary.png
-      Preprocessing step এর summary
-
-  Augmentation/Data/augmentation_report.png
-      Augmentation এর before/after distribution
-
-
-================================================================
-  RESULT SUMMARY (Expected)
-================================================================
-
-  Best Regression (Yield Prediction):
-    → Gradient Boosting, Merged/Preprocessed Data
-    → R2 ~ 0.94
-
-  Best Classification (Crop Recommendation):
-    → DNN, Merged Data
-    → Accuracy ~ 93-94%
-
-
-================================================================
-  ERROR হলে কি করবে
-================================================================
-
+ERROR FIX
+----------------------------------------------------------------
   ModuleNotFoundError:
-    → pip install scikit-learn pandas numpy matplotlib flask
+    pip install scikit-learn pandas numpy matplotlib flask
 
   FileNotFoundError:
-    → Order মতো Step 1 থেকে চালাও (Step 2 না করলে Step 3 কাজ করবে না)
+    Step 1 থেকে order মতো চালাও
 
-  UnicodeEncodeError (Windows):
-    → Terminal এ আগে দাও: $env:PYTHONIOENCODING = "utf-8"
-    → তারপর python master_comparison.py
+  UnicodeError (Windows):
+    $env:PYTHONIOENCODING = "utf-8"
+    তারপর python master_comparison.py
 
 ================================================================
