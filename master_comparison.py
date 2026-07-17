@@ -240,16 +240,23 @@ y_r = df_marge['Production_log']
 X_c = df_marge[CLS_FEAT_M]
 y_c = df_marge['Crop Name_enc']
 
-sc_r = StandardScaler()
-sc_c = StandardScaler()
-X_r_sc = pd.DataFrame(sc_r.fit_transform(X_r), columns=REG_FEAT_M)
-X_c_sc = pd.DataFrame(sc_c.fit_transform(X_c), columns=CLS_FEAT_M)
-
-X_tmp, X_te_r, y_tmp, y_te_r = train_test_split(X_r_sc, y_r, test_size=0.20, random_state=42)
+# Split first, then fit the scaler on the TRAIN split only — fitting on
+# X_r/X_c (the full pipeline) before splitting leaks test-set statistics
+# into the features the model is trained on.
+X_tmp, X_te_r, y_tmp, y_te_r = train_test_split(X_r, y_r, test_size=0.20, random_state=42)
 X_tr_r, X_vl_r, y_tr_r, y_vl_r = train_test_split(X_tmp, y_tmp, test_size=0.10, random_state=42)
 
-X_tmp, X_te_c, y_tmp, y_te_c = train_test_split(X_c_sc, y_c, test_size=0.20, random_state=42)
+X_tmp, X_te_c, y_tmp, y_te_c = train_test_split(X_c, y_c, test_size=0.20, random_state=42)
 X_tr_c, X_vl_c, y_tr_c, y_vl_c = train_test_split(X_tmp, y_tmp, test_size=0.10, random_state=42)
+
+sc_r = StandardScaler()
+sc_c = StandardScaler()
+X_tr_r = pd.DataFrame(sc_r.fit_transform(X_tr_r), columns=REG_FEAT_M, index=X_tr_r.index)
+X_vl_r = pd.DataFrame(sc_r.transform(X_vl_r),     columns=REG_FEAT_M, index=X_vl_r.index)
+X_te_r = pd.DataFrame(sc_r.transform(X_te_r),     columns=REG_FEAT_M, index=X_te_r.index)
+X_tr_c = pd.DataFrame(sc_c.fit_transform(X_tr_c), columns=CLS_FEAT_M, index=X_tr_c.index)
+X_vl_c = pd.DataFrame(sc_c.transform(X_vl_c),     columns=CLS_FEAT_M, index=X_vl_c.index)
+X_te_c = pd.DataFrame(sc_c.transform(X_te_c),     columns=CLS_FEAT_M, index=X_te_c.index)
 
 print(f"  Train: {len(X_tr_r):,}  Val: {len(X_vl_r):,}  Test: {len(X_te_r):,}")
 p1_reg, p1_cls = train_all_models(X_tr_r, y_tr_r, X_te_r, y_te_r,

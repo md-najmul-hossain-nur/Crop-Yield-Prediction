@@ -60,22 +60,22 @@ def train_and_save():
     # Regression — Gradient Boosting
     X_r = df[REG_FEAT].values
     y_r = df['Production_log'].values
+    X_tr, X_te, y_tr, y_te = train_test_split(X_r, y_r, test_size=0.2, random_state=42)
     sc_r = StandardScaler()
-    X_r_sc = sc_r.fit_transform(X_r)
-    X_tr, X_te, y_tr, y_te = train_test_split(X_r_sc, y_r, test_size=0.2, random_state=42)
+    X_tr_sc = sc_r.fit_transform(X_tr)
     gb = HistGradientBoostingRegressor(max_iter=150, learning_rate=0.05, max_depth=6, random_state=42)
-    gb.fit(X_tr, y_tr)
+    gb.fit(X_tr_sc, y_tr)
     print("  GB Regressor done")
 
     # Classification — Random Forest
     X_c = df[CLS_FEAT].values
     y_c = df['Crop_enc'].values
+    X_trc, _, y_trc, _ = train_test_split(X_c, y_c, test_size=0.2, random_state=42)
     sc_c = StandardScaler()
-    X_c_sc = sc_c.fit_transform(X_c)
-    X_trc, _, y_trc, _ = train_test_split(X_c_sc, y_c, test_size=0.2, random_state=42)
+    X_trc_sc = sc_c.fit_transform(X_trc)
     rf = RandomForestClassifier(n_estimators=150, max_depth=20, min_samples_leaf=2,
                                 class_weight='balanced', n_jobs=-1, random_state=42)
-    rf.fit(X_trc, y_trc)
+    rf.fit(X_trc_sc, y_trc)
     print("  RF Classifier done")
 
     bundle = dict(gb=gb, rf=rf, sc_r=sc_r, sc_c=sc_c,
@@ -106,6 +106,9 @@ def load_models():
     CLASSES['districts'] = sorted(b['le_district'].classes_.tolist())
     CLASSES['seasons']   = b['le_season'].classes_.tolist()
     print("Models ready")
+
+# Call this immediately so models are loaded when Gunicorn starts the app
+load_models()
 
 # ─────────────────────────────────────────
 # HTML

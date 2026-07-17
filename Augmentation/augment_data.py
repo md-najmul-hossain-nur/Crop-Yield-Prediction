@@ -37,6 +37,13 @@ print(f"  Columns        : {list(df.columns)}")
 
 ORIG_LEN = len(df)
 
+# Lineage marker: every synthetic row copies this from the original row it
+# was derived from. Downstream, the train/val/test split groups rows by
+# _orig_id instead of splitting individual rows at random — otherwise a
+# noisy near-duplicate of a row can end up in train while the row itself
+# ends up in test, leaking test information into training.
+df['_orig_id'] = np.arange(len(df))
+
 # Separate column types
 CAT_COLS  = ['District', 'Season', 'Crop Name', 'Transplant', 'Growth', 'Harvest']
 NUM_COLS  = ['Area', 'N', 'P', 'K', 'ph',

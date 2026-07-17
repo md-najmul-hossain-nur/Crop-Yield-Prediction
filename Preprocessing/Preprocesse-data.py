@@ -175,13 +175,17 @@ print("=" * 60)
 X_reg = df[REG_FEATURES]
 y_reg = df['Production_log']
 
-scaler_reg = StandardScaler()
-X_reg_scaled = pd.DataFrame(scaler_reg.fit_transform(X_reg), columns=REG_FEATURES)
-
 X_temp, X_te_r, y_temp, y_te_r = train_test_split(
-    X_reg_scaled, y_reg, test_size=0.20, random_state=42)
+    X_reg, y_reg, test_size=0.20, random_state=42)
 X_tr_r, X_val_r, y_tr_r, y_val_r = train_test_split(
     X_temp, y_temp, test_size=0.10, random_state=42)
+
+# Scaler is fit on the TRAIN split only, then applied to val/test —
+# fitting on the full dataset before splitting leaks test statistics into training.
+scaler_reg = StandardScaler()
+X_tr_r  = pd.DataFrame(scaler_reg.fit_transform(X_tr_r),  columns=REG_FEATURES, index=X_tr_r.index)
+X_val_r = pd.DataFrame(scaler_reg.transform(X_val_r),     columns=REG_FEATURES, index=X_val_r.index)
+X_te_r  = pd.DataFrame(scaler_reg.transform(X_te_r),      columns=REG_FEATURES, index=X_te_r.index)
 
 print(f"  Regression:")
 print(f"    Train : {X_tr_r.shape[0]:>5} rows  ({X_tr_r.shape[0]/len(df)*100:.1f}%)")
@@ -192,13 +196,15 @@ print(f"    Test  : {X_te_r.shape[0]:>5} rows  ({X_te_r.shape[0]/len(df)*100:.1f
 X_cls = df[CLS_FEATURES]
 y_cls = df['Crop_enc']
 
-scaler_cls = StandardScaler()
-X_cls_scaled = pd.DataFrame(scaler_cls.fit_transform(X_cls), columns=CLS_FEATURES)
-
 X_tempc, X_te_c, y_tempc, y_te_c = train_test_split(
-    X_cls_scaled, y_cls, test_size=0.20, random_state=42)
+    X_cls, y_cls, test_size=0.20, random_state=42)
 X_tr_c, X_val_c, y_tr_c, y_val_c = train_test_split(
     X_tempc, y_tempc, test_size=0.10, random_state=42)
+
+scaler_cls = StandardScaler()
+X_tr_c  = pd.DataFrame(scaler_cls.fit_transform(X_tr_c),  columns=CLS_FEATURES, index=X_tr_c.index)
+X_val_c = pd.DataFrame(scaler_cls.transform(X_val_c),     columns=CLS_FEATURES, index=X_val_c.index)
+X_te_c  = pd.DataFrame(scaler_cls.transform(X_te_c),      columns=CLS_FEATURES, index=X_te_c.index)
 
 print(f"  Classification:")
 print(f"    Train : {X_tr_c.shape[0]:>5} rows  ({X_tr_c.shape[0]/len(df)*100:.1f}%)")
