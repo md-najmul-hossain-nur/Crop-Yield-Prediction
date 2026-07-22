@@ -1,0 +1,26 @@
+================================================================
+  MATCH22 AUGMENTED DATASET RESULTS & EVALUATION SUMMARY
+  Dataset Expansion: 1,600 -> 19,200 rows (12.0x Growth)
+  Models: Random Forest (RF), Gradient Boosting (GB), DNN
+  Team: Light Seekers | CSE-4889 | UIU Bangladesh
+================================================================
+
+  Total Cleaned Rows : 11923
+  Train Set Rows     : 9331
+  Test Set Rows      : 2592
+
+----------------------------------------------------------------
+ 1. REGRESSION (YIELD PREDICTION - Production_log)
+----------------------------------------------------------------
+  [RF] R2 Score: 0.9213 | RMSE: 0.7174 | MAE: 0.4148
+  [GB] R2 Score: 0.9145 | RMSE: 0.7480 | MAE: 0.4891
+  [DNN] R2 Score: 0.5789 | RMSE: 1.6598 | MAE: 1.1477
+
+----------------------------------------------------------------
+ 2. CLASSIFICATION (CROP RECOMMENDATION - Crop_22_enc)
+----------------------------------------------------------------
+  [RF] Accuracy: 1.0000 | F1 Score: 1.0000
+  [GB] Accuracy: 1.0000 | F1 Score: 1.0000
+  [DNN] Accuracy: 1.0000 | F1 Score: 1.0000
+
+================================================================

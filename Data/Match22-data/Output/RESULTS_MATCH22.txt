@@ -1,0 +1,25 @@
+================================================================
+  MATCH22 DATASET MODEL RESULTS & EVALUATION SUMMARY
+  Models: Random Forest (RF), Gradient Boosting (GB), DNN
+  Team: Light Seekers | CSE-4889 | UIU Bangladesh
+================================================================
+
+  Total Cleaned Rows : 1,182
+  Train Set Rows     : 850
+  Test Set Rows      : 237
+
+----------------------------------------------------------------
+ 1. REGRESSION (YIELD PREDICTION - Production_log)
+----------------------------------------------------------------
+  [RF] R2 Score: 0.9520 | RMSE: 0.5361 | MAE: 0.4024
+  [GB] R2 Score: 0.9574 | RMSE: 0.5055 | MAE: 0.3757
+  [DNN] R2 Score: 0.8739 | RMSE: 0.8693 | MAE: 0.6564
+
+----------------------------------------------------------------
+ 2. CLASSIFICATION (CROP RECOMMENDATION - Crop_22_enc)
+----------------------------------------------------------------
+  [RF] Accuracy: 0.9958 | F1 Score: 0.9958
+  [GB] Accuracy: 0.9958 | F1 Score: 0.9957
+  [DNN] Accuracy: 0.9789 | F1 Score: 0.9725
+
+================================================================
