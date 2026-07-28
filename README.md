@@ -57,7 +57,7 @@ Three models are trained and compared for each task: **Random Forest**, **Gradie
 | Md. Farhan Sadik Shafin | 0112230546 |
 | Tanjil Hassan Sawan | 0112230556 |
 | Asif Mustoba Sazzad | 0112230236 |
-| Md. Arefin Iqram | 0112230926 |
+|MD. G.M. Rabbani Bhuiyan | 011222257 |
 
 **Supervised by:** Ms. Sadia Islam, Assistant Professor, Dept. of CSE
 **Submission Date:** April 28, 2026
