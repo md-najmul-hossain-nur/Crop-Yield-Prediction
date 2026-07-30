@@ -81,9 +81,12 @@ def train_and_save():
     bundle = dict(gb=gb, rf=rf, sc_r=sc_r, sc_c=sc_c,
                   le_season=le_season, le_district=le_district, le_crop=le_crop,
                   reg_feat=REG_FEAT, cls_feat=CLS_FEAT)
-    with open(PKL_PATH, 'wb') as f:
-        pickle.dump(bundle, f)
-    print(f"  Saved: {PKL_PATH}")
+    try:
+        with open(PKL_PATH, 'wb') as f:
+            pickle.dump(bundle, f)
+        print(f"  Saved: {PKL_PATH}")
+    except Exception as e:
+        print(f"  Could not save model pickle (read-only filesystem): {e}")
     return bundle
 
 def load_models():
@@ -107,108 +110,7 @@ def load_models():
     CLASSES['seasons']   = b['le_season'].classes_.tolist()
     print("Models ready")
 
-# Call this immediatfrom flask import Flask, render_template_string, request, jsonify, send_file, send_from_directory
-import pandas as pd
-import numpy as np
-import pickle, os, warnings
-warnings.filterwarnings('ignore')
-
-from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.model_selection import train_test_split
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PKL_PATH = os.path.join(BASE_DIR, 'app_models.pkl')
-
-app = Flask(__name__)
-
-MODEL   = {}
-ENCODER = {}
-CLASSES = {}
-
-# ─────────────────────────────────────────
-# TRAIN OR LOAD
-# ─────────────────────────────────────────
-def train_and_save():
-    print("Training models ...")
-    df = pd.read_csv(os.path.join(BASE_DIR, 'Data', 'Marge', 'merged_dataset.csv'))
-
-    for col in ['Transplant', 'Growth', 'Harvest', 'AP Ratio']:
-        if col in df.columns:
-            df.drop(columns=col, inplace=True)
-
-    df = df[df['Production'] > 0].copy()
-    Q1, Q3 = df['Production'].quantile(0.25), df['Production'].quantile(0.75)
-    IQR = Q3 - Q1
-    df = df[(df['Production'] >= Q1 - 3*IQR) & (df['Production'] <= Q3 + 3*IQR)].copy()
-    df.reset_index(drop=True, inplace=True)
-
-    le_season   = LabelEncoder()
-    le_district = LabelEncoder()
-    le_crop     = LabelEncoder()
-
-    df['Season_enc']     = le_season.fit_transform(df['Season'])
-    df['District_enc']   = le_district.fit_transform(df['District'])
-    df['Crop_enc']       = le_crop.fit_transform(df['Crop Name'])
-    df['Production_log'] = np.log1p(df['Production'])
-
-    REG_FEAT = ['Area','N','P','K','ph','Avg Temp','Min Temp','Max Temp',
-                'Avg Humidity','Min Relative Humidity','Max Relative Humidity',
-                'Rainfall','Season_enc','District_enc','Crop_enc']
-    CLS_FEAT = ['N','P','K','ph','Avg Temp','Avg Humidity','Rainfall',
-                'Season_enc','District_enc']
-
-    # Regression — Gradient Boosting
-    X_r = df[REG_FEAT].values
-    y_r = df['Production_log'].values
-    X_tr, X_te, y_tr, y_te = train_test_split(X_r, y_r, test_size=0.2, random_state=42)
-    sc_r = StandardScaler()
-    X_tr_sc = sc_r.fit_transform(X_tr)
-    gb = HistGradientBoostingRegressor(max_iter=150, learning_rate=0.05, max_depth=6, random_state=42)
-    gb.fit(X_tr_sc, y_tr)
-    print("  GB Regressor done")
-
-    # Classification — Random Forest
-    X_c = df[CLS_FEAT].values
-    y_c = df['Crop_enc'].values
-    X_trc, _, y_trc, _ = train_test_split(X_c, y_c, test_size=0.2, random_state=42)
-    sc_c = StandardScaler()
-    X_trc_sc = sc_c.fit_transform(X_trc)
-    rf = RandomForestClassifier(n_estimators=100, max_depth=6, min_samples_leaf=6,
-                                class_weight='balanced', n_jobs=-1, random_state=42)
-    rf.fit(X_trc_sc, y_trc)
-    print("  RF Classifier done")
-
-    bundle = dict(gb=gb, rf=rf, sc_r=sc_r, sc_c=sc_c,
-                  le_season=le_season, le_district=le_district, le_crop=le_crop,
-                  reg_feat=REG_FEAT, cls_feat=CLS_FEAT)
-    with open(PKL_PATH, 'wb') as f:
-        pickle.dump(bundle, f)
-    print(f"  Saved: {PKL_PATH}")
-    return bundle
-
-def load_models():
-    global MODEL, ENCODER, CLASSES
-    if os.path.exists(PKL_PATH):
-        print("Loading saved models ...")
-        with open(PKL_PATH, 'rb') as f:
-            b = pickle.load(f)
-    else:
-        b = train_and_save()
-
-    MODEL['reg'] = b['gb']
-    MODEL['cls'] = b['rf']
-    ENCODER['sc_r']     = b['sc_r']
-    ENCODER['sc_c']     = b['sc_c']
-    ENCODER['season']   = b['le_season']
-    ENCODER['district'] = b['le_district']
-    ENCODER['crop']     = b['le_crop']
-    CLASSES['crops']     = sorted(b['le_crop'].classes_.tolist())
-    CLASSES['districts'] = sorted(b['le_district'].classes_.tolist())
-    CLASSES['seasons']   = b['le_season'].classes_.tolist()
-    print("Models ready")
-
-# Call this immediately so models are loaded when Gunicorn starts the app
+# Call this immediately so models are loaded when Gunicorn/Vercel starts the app
 load_models()
 
 # ─────────────────────────────────────────
