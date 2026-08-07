@@ -570,7 +570,7 @@ HTML = """<!DOCTYPE html>
     display: flex; align-items: center; gap: 8px;
   }
   .stat-three-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
   }
   .stat-row-item {
     background: rgba(255, 255, 255, 0.75);
@@ -885,14 +885,6 @@ HTML = """<!DOCTYPE html>
             <div class="s-title">Crop Recommendation Engine</div>
           </div>
           <span class="s-score highlight-score">Accuracy = 94.03% &nbsp;&bull;&nbsp; F1 = 0.9323</span>
-        </div>
-
-        <div class="stat-row-item dataset">
-          <div>
-            <div class="s-label">Dataset Infrastructure</div>
-            <div class="s-title">Bangladesh Multimodal Data</div>
-          </div>
-          <span class="s-score">4,607 records &bull; 72 crops &bull; 64 districts</span>
         </div>
 
       </div>
