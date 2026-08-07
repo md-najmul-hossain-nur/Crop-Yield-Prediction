@@ -1,0 +1,13 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+.env
+.venv
+venv/
+Output/
+Augmentation/
+Preprocessing/
+master_comparison.py
+RESULTS.txt
+HOW_TO_RUN.txt
